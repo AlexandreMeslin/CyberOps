@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this repository in academic work, please cite it as follows."
+title: "Curso de CyberOps - PUC-Rio"
+version: "2026.2"
+doi: null
+url: "[https://github.com/AlexandreMeslin/CyberOps](https://github.com/AlexandreMeslin/CyberOps)"
+abstract: "Material didático e código-fonte do curso de CyberOps da Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio). O repositório contém exemplos, exercícios, templates e projetos utilizados em aula."
+keywords:
+  - cybersegurança
+  - engenharia de software
+  - projeto de software
+  - ensino
+  - PUC-Rio
+  - GitHub Classroom
+authors:
+  - family-names: "Meslin"
+    given-names: "Alexandre"
+    affiliation: "Departamento de Informática, Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio)"
+    orcid: "[https://orcid.org/0000-0002-2038-043X](https://orcid.org/0000-0002-2038-043X)"
+    license: "MIT"
+    title: "CyberOps - PUC-Rio"
+    year: 2026
+    version: "2026.2"
+    url: "[https://github.com/AlexandreMeslin/CyberOps](https://github.com/AlexandreMeslin/CyberOps)"
+preferred-citation:
+  type: software
+  title: "CyberOps - PUC-Rio"
+  version: "2026.2"
+  url: "[https://github.com/AlexandreMeslin/CyberOps](https://github.com/AlexandreMeslin/CyberOps)"
+  authors:
+    - family-names: "Meslin"
+      given-names: "Alexandre"
+      affiliation: "Departamento de Informática, Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio)"
+      orcid: "[https://orcid.org/0000-0002-2038-043X](https://orcid.org/0000-0002-2038-043X)"
+      license: "MIT"
+      title: "CyberOps - PUC-Rio"
+      year: 2026
+      version: "2026.2"
+      url: "[https://github.com/AlexandreMeslin/CyberOps](https://github.com/AlexandreMeslin/CyberOps)"
