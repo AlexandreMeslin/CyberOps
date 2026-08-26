@@ -15,4 +15,4 @@ Repositório para o curso de extensão de CyberOps da PUC-Rio, cobrindo a teoria
 
 ## Objetivo do curso
 
-Este curso apresenta a teoria e a prática dos principais conceitos de redes e protocolos, oferecendo uma base conceitual e aplicada para o estudo de CyberOps.
+O objetivo do curso é consolidar os fundamentos de redes e protocolos por meio de aulas teóricas e atividades práticas aplicadas ao contexto de CyberOps.
