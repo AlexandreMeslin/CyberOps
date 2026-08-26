@@ -15,4 +15,4 @@ Repositório para o curso de extensão de CyberOps da PUC-Rio, cobrindo a teoria
 
 ## Objetivo do curso
 
-Este curso apresenta a teoria e a prática de todas as aulas teóricas, oferecendo uma base conceitual e aplicada para o estudo de CyberOps.
+Este curso apresenta a teoria e a prática dos principais conceitos de redes e protocolos, oferecendo uma base conceitual e aplicada para o estudo de CyberOps.
