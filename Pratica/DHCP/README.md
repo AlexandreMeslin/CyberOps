@@ -1,6 +1,6 @@
 # Laboratório de DHCP
 
-Nesse laboratório, vamos investigar como os hosts obtém o seu endereço IPv4, sua máscara de rede, endereço de gateway e outras configurações iniciais.
+Nesse laboratório vamos investigar como os hosts obtém o seu endereço IPv4, sua máscara de rede, endereço de gateway e outras configurações iniciais.
 
 # Requisitos
 
@@ -199,3 +199,23 @@ Liste os dados obtidos pelo seu container Ubuntu via DHCP:
 - Endereço de broadcast
 - Nome do domínio
 - Servidor de DNS
+
+# Comandos interessantes
+
+Para remover a rede `MACVLAN`:
+
+```bash
+$ sudo docker network rm dhcp-net
+```
+
+Para verificar se a rede `MACVLAN` existe:
+
+```bash
+$ sudo docker network ls
+```
+
+Para verificar quais containers estão conectados em determinada rede (por exemplo, na rede `dhcp-net`):
+
+```bash
+$ sudo docker network inspect dhcp-net
+```
