@@ -1,0 +1,25 @@
+services:
+
+  server:
+    image: meslin/socket-server:latest
+    container_name: socket-server
+    hostname: server
+    networks:
+      - socket-net
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+  client:
+    image: meslin/socket-client:latest
+    container_name: socket-client
+    hostname: client
+    networks:
+      - socket-net
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+networks:
+  socket-net:
+    driver: bridge

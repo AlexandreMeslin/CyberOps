@@ -2,23 +2,18 @@
 
 Nesse laboratório vamos investigar como os hosts obtém o seu endereço IPv4, sua máscara de rede, endereço de gateway e outras configurações iniciais.
 
-# Requisitos
+## Requisitos
 
 - Docker
 - Wireshark
 
-Opcionalmente você vai querer instalar alguns pacotes interessantes no seu container Ubuntu:
+## Procedimento
 
-```bash
-apt update
-apt install -y net-tools iputils-ping
-```
+### Nome da interface **ethernet**
 
-# Procedimento
+No seu computador (host), verifique o nome da sua interface de rede **ethernet**.
 
-## Nome da interface **ethernet**
-
-No seu computador (host), verifique o nome da sua interface de rede **ethernet** com o comando:
+No host:
 
 ```bash
 $ ip link
@@ -54,9 +49,11 @@ $ ip link
 Uma interface ethernet tem o formato do nome com `enpXXX` ou `ethXXX`
 Nesse caso, o nome da interface ethernet é `enp2s0`
 
-## Endereço da interface
+### Endereço da interface
 
-Verifique o endereço IPv4 da sua interface ethernet (substitua `enp2s0` pelo nome da sua interface):
+Verifique o endereço IPv4 da interface ethernet do host (substitua `enp2s0` pelo nome da sua interface):
+
+No host:
 
 ```bash
 $ ip -4 addr show dev enp2s0
@@ -73,9 +70,11 @@ $ ip -4 addr show dev enp2s0
 
 Nesse caso, o endereço da interface é `10.0.0.199` com máscara `/24` (`255.255.255.0`)
 
-## Informações de roteamento
+### Informações de roteamento
 
-Use o comando a seguir para obter informações sobre o roteamento, principalmente sobre o `default gateway` da rede conectada à interface ethernet:
+Use o comando a seguir para obter informações sobre o roteamento, principalmente sobre o `default gateway` da rede conectada à interface ethernet do host:
+
+No host: 
 
 ```bash
 $ ip route
@@ -98,13 +97,15 @@ default via 10.0.0.1 dev wlo1 proto dhcp src 10.0.0.146 metric 600
 
 Nesse caso, o default gateway é `10.0.0.1`
 
-## Crie a rede *macvlan*
+### Crie a rede *macvlan*
 
 Uma macvlan é uma tecnologia do Linux que permite criar interfaces de rede virtuais com endereços MAC próprios, associadas a uma interface física existente.
 
 No Docker, ela permite que um container apareça na rede física como se fosse um dispositivo independente, em vez de ficar atrás da rede bridge do Docker.
 
 Para criar a sua rede macvlan, substitua os valores de subnet, gateway e parent pelos valores que você obteve nos passos anteriores
+
+No host: 
 
 ```bash
 $ sudo docker network create \
@@ -115,10 +116,12 @@ $ sudo docker network create \
     dhcp-net
 ```
 
-## Criando o container
+### Criando o container
 
 Crie um container com uma imagem Ubuntu.
 Esse container precisa ser criado com permissões especiais para uso de rede.
+
+No host:
 
 ```bash
 $ sudo docker run --rm -it \
@@ -126,23 +129,27 @@ $ sudo docker run --rm -it \
     --cap-add=NET_ADMIN \
     --cap-add=NET_RAW \
     --entrypoint /bin/bash \
-    ubuntu:latest
+    meslin/ferramentas-dhcp:latest
 ```
 
 No container, instale os requisitos:
+
+No container:
 
 ```bash
 apt update
 apt install -y isc-dhcp-client
 ```
 
-## Iniciando a captura com o Wireshark
+### Iniciando a captura com o Wireshark
 
 No seu host, abra o Wireshark.
 Selecione a sua interface ethernet (no exemplo, usamos a interface `enp2s0`).
 Comece a captura.
 
 No container, digite o seguinte comando: 
+
+No container:
 
 ```bash
 dhclient -v eth0
@@ -171,25 +178,25 @@ bound to 10.0.0.49 -- renewal in 86215 seconds.
 No seu computador host, pare a captura do Wireshark.
 Use `DHCP` como filtro e examine os pacotes capturados.
 
-# Resultados
+## Resultados
 
-## DHCP Discover
+### DHCP Discover
 
 ![DHCP Discover](img/DHCP-Discover.png)
 
-## DHCP Offer
+### DHCP Offer
 
 ![DHCP Offer](img/DHCP-Offer.png)
 
-## DHCP Request
+### DHCP Request
 
 ![DHCP Request](img/DHCP-Request.png)
 
-## DHCP ACK
+### DHCP ACK
 
 ![DHCP ACK](img/DHCP-Ack.png)
 
-## Dados obtidos
+### Dados obtidos
 
 Liste os dados obtidos pelo seu container Ubuntu via DHCP:
 - Endereço IP
@@ -200,7 +207,7 @@ Liste os dados obtidos pelo seu container Ubuntu via DHCP:
 - Nome do domínio
 - Servidor de DNS
 
-# Comandos interessantes
+## Comandos interessantes
 
 Para remover a rede `MACVLAN`:
 

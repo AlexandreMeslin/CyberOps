@@ -2,20 +2,20 @@
 
 Nesse laboratório vamos observar todo o processo de uma requisição HTTP, desde o estabelecimento da conexão TCP até a resposta do servidor HTTP, o Apache, no nosso caso.
 
-# Requisitos
+## Requisitos
 
 - Docker
 - Wireshark
 - cURL
 - Navegador
 
-# Procedimento
+## Procedimento
 
 1. Criar o container Apache
 1. Verificar o funcionamento
 1. Monitorar uma requisição HTTP
 
-## Criar um servidor Apache
+### Criar um servidor Apache
 
 Para o servidor HTTP, vamos usar uma imagem oficial do Apache HTTP Server ([The Apache HTTP Server Project](https://hub.docker.com/_/httpd)).
 
@@ -25,7 +25,7 @@ Crie o container baseado no servidor Apache:
 $ sudo docker run -d --name apache-http httpd
 ```
 
-## Testes iniciais
+### Testes iniciais
 
 Verifique se o container está rodando:
 
@@ -90,7 +90,7 @@ Content-Type: text/html
 </html>
 ```
 
-## Captura dos datagramas
+### Captura dos datagramas
 
 1. Inicie o Wireshark.
 
@@ -102,7 +102,7 @@ Content-Type: text/html
 
 ![Página HTML](img/HTTP-page.png)
 
-## Análise da captura
+### Análise da captura
 
 Verifique se a sua captura começa com o pedido de conexão do seu navegador, incluindo o handshake triplo e a finalização da conexão:
 
@@ -120,7 +120,7 @@ Clique em qualquer parte da conversação com o botão direito do mouse e seleci
 
 ![TCP Stream](img/HTTP-TCP_Stream.png)
 
-## Dados obtidos
+### Dados obtidos
 
 1. Compare o header exibido pelo comando `cURL` com o que foi capturado pelo Wireshark.
 
