@@ -51,8 +51,9 @@ def sendall(client_socket):
         if mensagem.lower() == "sair":
             break
         client_socket.sendall(mensagem.encode())
+        print("Aguardando resposta do servidor... ", end="", flush=True)
         data = client_socket.recv(1024)
-        print(f"Servidor: {data.decode()}")
+        print(f"\nServidor: {data.decode()}")
     return
 
 def close(client_socket):

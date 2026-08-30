@@ -69,13 +69,14 @@ def recv(conn, addr):
     print(f"Cliente conectado: {addr}")
 
     while True:
-        data = conn.recv(1024)
+        print("Aguardando mensagem do cliente... ", end="", flush=True)
+        data = conn.recv(1024)  # Recebe até 1024 bytes de dados do cliente
         if not data:
             break
-        mensagem = data.decode()
-        print(f"Cliente: {mensagem}")
+        mensagem = data.decode()    # Decodifica os bytes recebidos em uma string
+        print(f"\nCliente: {mensagem}")
         resposta = input("Servidor: ")
-        conn.sendall(resposta.encode())
+        conn.sendall(resposta.encode()) # Envia a resposta de volta ao cliente
     return
 
 def close(conn, server_socket):

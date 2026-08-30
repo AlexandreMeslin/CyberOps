@@ -124,7 +124,7 @@ Clique em qualquer parte da conversação com o botão direito do mouse e seleci
 
 1. Compare o header exibido pelo comando `cURL` com o que foi capturado pelo Wireshark.
 
-1. Verifique quantas pedidos (`request`) HTTP foram feitos em cada conexão.
+1. Verifique quantos pedidos (`request`) HTTP foram feitos em cada conexão.
 
 1. Quais foram os recursos pedidos em cada *request*?
 
