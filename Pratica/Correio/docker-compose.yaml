@@ -1,0 +1,41 @@
+services:
+
+  mail-server:
+    # https://hub.docker.com/r/dovecot/dovecot
+    image: dovecot/dovecot:2.3-latest
+    container_name: mail-server
+    hostname: mail-server
+
+    volumes:
+      - ./server/etc/dovecot/dovecot.conf:/etc/dovecot/dovecot.conf:ro    
+
+    networks:
+      mail-net:
+        ipv4_address: 172.18.0.2  # IP address for the mail server
+
+    # Keep the container running and allow interactive input
+    stdin_open: true  
+    tty: true
+  
+  mail-client:
+    # https://hub.docker.com/_/ubuntu
+    image: meslin/mail-client:latest
+    container_name: mail-client
+    hostname: mail-client
+
+    networks:
+      mail-net:
+        ipv4_address: 172.18.0.3  # IP address for the mail client
+
+    # Keep the container running and allow interactive input
+    stdin_open: true  
+    tty: true         
+
+networks:
+
+  mail-net:
+    driver: bridge  # Use the bridge driver for the network
+
+    ipam:
+      config:
+        - subnet: 172.18.0.0/24 # Define a subnet for the network

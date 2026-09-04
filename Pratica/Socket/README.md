@@ -182,7 +182,7 @@ Veja no Wireshark a captura de cada mensagem.
 Para terminar, digite `sair` como mensagem no cliente.
 Espere a flag de FIN na captura do Wireshark para terminar a captura.
 
-![Captura completa](img/Socket-caputra.png)
+![Captura completa](img/Socket-captura.png)
 
 Veja as mensagens enviadas durante a conexão.
 

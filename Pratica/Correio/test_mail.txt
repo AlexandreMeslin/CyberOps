@@ -1,0 +1,11 @@
+From: meslin@puc-rio.br
+To: test@localhost
+Subject: Primeira mensagem
+Date: Thu, 3 Sep 2026 18:00:00 -0300
+
+Olá!
+
+Esta é uma mensagem criada para o laboratório de POP3 e IMAP.
+
+Atenciosamente,
+Alexandre Meslin
