@@ -343,3 +343,22 @@ Liste os dados obtidos pelo seu container Ubuntu via DHCP:
 - Endereço de broadcast
 - Nome do domínio
 - Servidor de DNS
+
+# pequeno desafio (com letras minúsculas)
+
+Libere o endereço IP que você obteve.
+Capture e analise os pacotes usando o Wireshark.
+Utilize o comando `dhclient -r eth0` para matar o processo cliente.
+
+No cliente:
+
+```bash
+root@dhcp-client:/# dhclient -r eth0
+```
+
+Resultado esperado
+
+```bash
+root@dhcp-client:/# dhclient -r eth0
+Killed old client process
+```
