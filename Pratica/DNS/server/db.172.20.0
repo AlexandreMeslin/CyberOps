@@ -1,0 +1,17 @@
+$TTL 300
+
+@   IN  SOA dns.empresa.test. admin.empresa.test. (
+        2026090501
+        3600
+        600
+        86400
+        300
+)
+
+    IN  NS  dns.empresa.test.
+
+10  IN  PTR dns.empresa.test.
+20  IN  PTR www.empresa.test.
+21  IN  PTR server.empresa.test.
+30  IN  PTR mail.empresa.test.
+40  IN  PTR ftp.empresa.test.

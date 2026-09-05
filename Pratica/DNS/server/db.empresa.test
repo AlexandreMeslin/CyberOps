@@ -1,0 +1,20 @@
+$TTL 300
+
+@   IN  SOA dns.empresa.test. admin.empresa.test. (
+        2026090501
+        3600
+        600
+        86400
+        300
+)
+
+    IN  NS  dns.empresa.test.
+
+dns     IN  A   172.20.0.10
+
+www     IN  A   172.20.0.20
+server  IN  A   172.20.0.21
+mail    IN  A   172.20.0.30
+ftp     IN  A   172.20.0.40
+
+@       IN  MX  10 mail.empresa.test.

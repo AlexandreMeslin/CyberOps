@@ -1,0 +1,30 @@
+services:
+
+  dns-server:
+    image: meslin/dns-server
+    container_name: dns-server
+    hostname: dns
+    networks:
+      dns-net:
+        ipv4_address: 172.20.0.10
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+  dns-client:
+    image: meslin/dns-client
+    container_name: dns-client
+    hostname: client
+    stdin_open: true
+    tty: true
+    networks:
+      dns-net:
+
+networks:
+  dns-net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
