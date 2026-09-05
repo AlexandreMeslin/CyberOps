@@ -22,7 +22,7 @@ $ sudo docker compose up -d
 Resultado esperado:
 
 ```bash
- sudo docker compose up -d
+$ sudo docker compose up -d
 [+] Running 3/3
  ✔ Network dhcp_dhcp-net  Created                             0.0s 
  ✔ Container dhcp-server  Started                             0.4s 
@@ -42,6 +42,23 @@ $ sudo docker ps -a
 CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS     NAMES
 c2aae4d145f9   meslin/dhcp-server:latest   "dhcpd -f -d --no-pi…"   27 seconds ago   Up 26 seconds             dhcp-server
 7144f14720e8   meslin/dhcp-client:latest   "/bin/bash"              27 seconds ago   Up 26 seconds             dhcp-client
+```
+
+Verifique as redes existentes:
+
+```bash
+$ sudo docker network ls
+```
+
+Resultado esperado:
+
+```bash
+$ sudo docker network ls
+NETWORK ID     NAME            DRIVER    SCOPE
+626fb2ea3cb6   bridge          bridge    local
+c698171464ec   dhcp_dhcp-net   bridge    local
+1b5be87839cd   host            host      local
+97f519bf0843   none            null      local
 ```
 
 Verifique também a rede que foi criada:
@@ -118,7 +135,7 @@ $ sudo docker network inspect dhcp_dhcp-net
 ]
 ```
 
-No exemplo, o servidor tem o endereço IP 192.168.50.2/24 e o cliente 192.168.50.3/24.
+No exemplo, o servidor tem o endereço IP 192.168.50.2/24 e o cliente, 192.168.50.3/24.
 
 Anote os 12 primeiros caracteres do ID da rede.
 Nesse exemplo, o ID é "Id": "c749a7d4d53bb2f1a7761d98629a5c1f66a2d33279c3f135d00e0fd488f0894a".
@@ -253,7 +270,7 @@ $ sudo docker exec -it dhcp-server bash
 root@dhcp-server:/#
 ```
 
-Liste o arquivo dhcpd.leases para verificar quais endereos IP foram fornecidos.
+Liste o arquivo `dhcpd.leases` para verificar quais endereÇos IP foram fornecidos.
 
 No server:
 
@@ -283,26 +300,46 @@ lease 192.168.50.100 {
   hardware ethernet b2:31:65:5d:ea:a7;
   client-hostname "dhcp-client";
 }
-lease 192.168.50.100 {
-  starts 6 2026/09/05 02:19:32;
-  ends 6 2026/09/05 02:29:32;
-  cltt 6 2026/09/05 02:19:32;
-  binding state active;
-  next binding state free;
-  rewind binding state free;
-  hardware ethernet b2:31:65:5d:ea:a7;
-  client-hostname "dhcp-client";
-}
-lease 192.168.50.100 {
-  starts 6 2026/09/05 02:24:04;
-  ends 6 2026/09/05 02:34:04;
-  cltt 6 2026/09/05 02:24:04;
-  binding state active;
-  next binding state free;
-  rewind binding state free;
-  hardware ethernet b2:31:65:5d:ea:a7;
-  client-hostname "dhcp-client";
-}
 ```
 
-### Resultados
+## Resultados
+
+### Captura
+
+Analise a captura.
+Se necessário, filtre por `DHCP`.
+
+![Captura DHCP](img/DHCP-captura.png)
+
+### DHCP Discover
+
+![DHCP Discover](img/DHCP-Discover.png)
+
+### DHCP Offer
+
+![DHCP Offer](img/DHCP-Offer.png)
+
+### DHCP Request
+
+![DHCP Request](img/DHCP-Request.png)
+
+### DHCP Ack
+
+![DHCP Ack](img/DHCP-Ack.png)
+
+### Captura completa
+
+Analise a captura completa, sem filtros:
+
+![DHCP Captura Completa](img/DHCP-Captura_Completa.png)
+
+### Dados obtidos
+
+Liste os dados obtidos pelo seu container Ubuntu via DHCP:
+- Endereço IP
+- Máscara de rede
+- Default Gateway
+- Lease time
+- Endereço de broadcast
+- Nome do domínio
+- Servidor de DNS
