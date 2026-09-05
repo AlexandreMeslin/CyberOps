@@ -7,222 +7,302 @@ Nesse laboratório vamos investigar como os hosts obtém o seu endereço IPv4, s
 - Docker
 - Wireshark
 
+## Bibliografia
+
+- [DHCP RFC2131](https://datatracker.ietf.org/doc/html/rfc9051)
+
 ## Procedimento
 
-### Nome da interface **ethernet**
+Suba os containers:
 
-No seu computador (host), verifique o nome da sua interface de rede **ethernet**.
+```bash
+$ sudo docker compose up -d
+```
+
+Resultado esperado:
+
+```bash
+ sudo docker compose up -d
+[+] Running 3/3
+ ✔ Network dhcp_dhcp-net  Created                             0.0s 
+ ✔ Container dhcp-server  Started                             0.4s 
+ ✔ Container dhcp-client  Started                             0.4s 
+```
+
+Verifique se os containers estão no ar:
+
+```bash
+$ sudo docker ps -a
+```
+
+Resultado esperado:
+
+```bash
+$ sudo docker ps -a
+CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS     NAMES
+c2aae4d145f9   meslin/dhcp-server:latest   "dhcpd -f -d --no-pi…"   27 seconds ago   Up 26 seconds             dhcp-server
+7144f14720e8   meslin/dhcp-client:latest   "/bin/bash"              27 seconds ago   Up 26 seconds             dhcp-client
+```
+
+Verifique também a rede que foi criada:
+
+```bash
+$ sudo docker network inspect dhcp_dhcp-net
+```
+
+Resultado esperado:
+
+```bash
+$ sudo docker network inspect dhcp_dhcp-net
+[
+    {
+        "Name": "dhcp_dhcp-net",
+        "Id": "c749a7d4d53bb2f1a7761d98629a5c1f66a2d33279c3f135d00e0fd488f0894a",
+        "Created": "2026-09-04T22:58:12.311967379-03:00",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "192.168.50.0/24",
+                    "IPRange": "",
+                    "Gateway": "192.168.50.1"
+                }
+            ]
+        },
+        "Internal": true,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {},
+        "Labels": {
+            "com.docker.compose.config-hash": "368028f1effe8db5d65d97c989da94d87b380cf7dbc77cea042d2d0dfb1ed3e6",
+            "com.docker.compose.network": "dhcp-net",
+            "com.docker.compose.project": "dhcp",
+            "com.docker.compose.version": "2.40.3"
+        },
+        "Containers": {
+            "7144f14720e8b2f38fc1c6037416cb57cdcfbd3cc318cc2e8b417ecd32152c12": {
+                "Name": "dhcp-client",
+                "EndpointID": "485c0eb2725acad3b1cee1f94e56080f65b94dc127c95345588b831d1dbd111f",
+                "MacAddress": "6a:da:c8:38:95:25",
+                "IPv4Address": "192.168.50.3/24",
+                "IPv6Address": ""
+            },
+            "c2aae4d145f9aa5d6774478069921e02c0dea2f73add0a2e604a6d848f66ba1e": {
+                "Name": "dhcp-server",
+                "EndpointID": "a6804103a37523d66c36c0360880926dc16c2dcced654f067087b7623e58f037",
+                "MacAddress": "56:53:1a:3c:f5:7c",
+                "IPv4Address": "192.168.50.2/24",
+                "IPv6Address": ""
+            }
+        },
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "192.168.50.0/24": {
+                        "IPsInUse": 5,
+                        "DynamicIPsAvailable": 251
+                    }
+                }
+            }
+        }
+    }
+]
+```
+
+No exemplo, o servidor tem o endereço IP 192.168.50.2/24 e o cliente 192.168.50.3/24.
+
+Anote os 12 primeiros caracteres do ID da rede.
+Nesse exemplo, o ID é "Id": "c749a7d4d53bb2f1a7761d98629a5c1f66a2d33279c3f135d00e0fd488f0894a".
+O nome da rede Linux criada é formada por `br-<12 primeiros caracteres>`, ou seja, `br-c749a7d4d53b`.
+Verifique o seu nome de rede para poder iniciar a captura com o Wireshark.
+
+### Início da Captura
+
+Através do Wireshark, inicie a captura na interface de rede `br-c749a7d4d53b` (substitua pela sua interface, vista um pouco acima).
+
+### Obtendo Endereço IP via DHCP
+
+Entre no container cliente.
 
 No host:
 
 ```bash
-$ ip link
+$ sudo docker exec -it dhcp-client bash
 ```
 
-Por exemplo:
+No container do cliente, verifique o endereço IP atribuido pelo Docker:
+
+No cliente:
 
 ```bash
-$ ip link
-1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
-    link/ether 54:bf:64:10:21:86 brd ff:ff:ff:ff:ff:ff
-5: enx28ee521160ec: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
-    link/ether 28:ee:52:11:60:ec brd ff:ff:ff:ff:ff:ff
-6: wlo1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP mode DORMANT group default qlen 1000
-    link/ether 7c:76:35:f4:c2:07 brd ff:ff:ff:ff:ff:ff
-    altname wlp0s20f3
-7: br-dee386f79b90: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default 
-    link/ether 82:32:d6:2a:05:9e brd ff:ff:ff:ff:ff:ff
-8: br-328e39d774b5: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default 
-    link/ether 16:a5:ad:df:4a:1c brd ff:ff:ff:ff:ff:ff
-9: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default 
-    link/ether 36:3a:32:8c:52:d8 brd ff:ff:ff:ff:ff:ff
-10: br-7eaf91072c1c: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default 
-    link/ether 26:8d:de:75:51:57 brd ff:ff:ff:ff:ff:ff
-11: br-a797b57d1a66: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default 
-    link/ether 12:74:1a:57:be:b0 brd ff:ff:ff:ff:ff:ff
-89: enx803f5d09de70: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
-    link/ether 80:3f:5d:09:de:70 brd ff:ff:ff:ff:ff:ff
+root@dhcp-client:/# ip addr show eth0
 ```
 
-Uma interface ethernet tem o formato do nome com `enpXXX` ou `ethXXX`
-Nesse caso, o nome da interface ethernet é `enp2s0`
-
-### Endereço da interface
-
-Verifique o endereço IPv4 da interface ethernet do host (substitua `enp2s0` pelo nome da sua interface):
-
-No host:
+Resultado esperado:
 
 ```bash
-$ ip -4 addr show dev enp2s0
+root@dhcp-client:/# ip addr show eth0
+2: eth0@if65: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 6a:da:c8:38:95:25 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.168.50.3/24 brd 192.168.50.255 scope global eth0
+       valid_lft forever preferred_lft forever
 ```
 
-Por exemplo:
+Neste exemplo, o cliente está com endereço IP 192.168.50.3.
+Agora vamos remover o endereço atribuido pelo Docker e obter um novo endereço IP através de DHCP usando o nosso servidor.
+
+No cliente, execute os dois comandos a seguir:
 
 ```bash
-$ ip -4 addr show dev enp2s0
-2: enp2s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
-    inet 10.0.0.199/24 brd 10.0.0.255 scope global dynamic noprefixroute enp2s0
-       valid_lft 163132sec preferred_lft 163132sec
+root@dhcp-client:/# ip addr flush dev eth0
+root@dhcp-client:/# ip route flush dev eth0
 ```
 
-Nesse caso, o endereço da interface é `10.0.0.199` com máscara `/24` (`255.255.255.0`)
-
-### Informações de roteamento
-
-Use o comando a seguir para obter informações sobre o roteamento, principalmente sobre o `default gateway` da rede conectada à interface ethernet do host:
-
-No host: 
+Verifique agora o estado da interface de rede:
 
 ```bash
-$ ip route
+root@dhcp-client:/# ip addr show eth0
 ```
 
-Por exemplo:
+Veja que a interface não tem mais endereço IP.
+
+Resultado esperado:
 
 ```bash
-$ ip route
-default via 10.0.0.1 dev enp2s0 proto dhcp src 10.0.0.199 metric 100 
-default via 10.0.0.1 dev wlo1 proto dhcp src 10.0.0.146 metric 600 
-10.0.0.0/24 dev enp2s0 proto kernel scope link src 10.0.0.199 metric 100 
-10.0.0.0/24 dev wlo1 proto kernel scope link src 10.0.0.146 metric 600 
-172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
-172.18.0.0/16 dev br-328e39d774b5 proto kernel scope link src 172.18.0.1 linkdown 
-172.19.0.0/16 dev br-dee386f79b90 proto kernel scope link src 172.19.0.1 linkdown 
-172.20.0.0/16 dev br-7eaf91072c1c proto kernel scope link src 172.20.0.1 linkdown 
-172.21.0.0/16 dev br-a797b57d1a66 proto kernel scope link src 172.21.0.1 linkdown 
+root@dhcp-client:/# ip addr show eth0
+2: eth0@if76: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether b2:31:65:5d:ea:a7 brd ff:ff:ff:ff:ff:ff link-netnsid 0
 ```
 
-Nesse caso, o default gateway é `10.0.0.1`
+Busque um novo endereço IP via DHCP.
 
-### Crie a rede *macvlan*
-
-Uma macvlan é uma tecnologia do Linux que permite criar interfaces de rede virtuais com endereços MAC próprios, associadas a uma interface física existente.
-
-No Docker, ela permite que um container apareça na rede física como se fosse um dispositivo independente, em vez de ficar atrás da rede bridge do Docker.
-
-Para criar a sua rede macvlan, substitua os valores de subnet, gateway e parent pelos valores que você obteve nos passos anteriores
-
-No host: 
+No cliente:
 
 ```bash
-$ sudo docker network create \
-    -d macvlan \
-    --subnet=10.0.0.0/24 \
-    --gateway=10.0.0.1 \
-    -o parent=enp2s0 \
-    dhcp-net
+root@dhcp-client:/# dhclient -v eth0
 ```
 
-### Criando o container
-
-Crie um container com uma imagem Ubuntu.
-Esse container precisa ser criado com permissões especiais para uso de rede.
-
-No host:
+Resultado esperado:
 
 ```bash
-$ sudo docker run --rm -it \
-    --network dhcp-net \
-    --cap-add=NET_ADMIN \
-    --cap-add=NET_RAW \
-    --entrypoint /bin/bash \
-    meslin/ferramentas-dhcp:latest
-```
-
-No container, instale os requisitos:
-
-No container:
-
-```bash
-apt update
-apt install -y isc-dhcp-client
-```
-
-### Iniciando a captura com o Wireshark
-
-No seu host, abra o Wireshark.
-Selecione a sua interface ethernet (no exemplo, usamos a interface `enp2s0`).
-Comece a captura.
-
-No container, digite o seguinte comando: 
-
-No container:
-
-```bash
-dhclient -v eth0
-```
-
-Resultado esperado: 
-
-```bash
+root@dhcp-client:/# dhclient -v eth0
 Internet Systems Consortium DHCP Client 4.4.3-P1
 Copyright 2004-2022 Internet Systems Consortium.
 All rights reserved.
 For info, please visit https://www.isc.org/software/dhcp/
 
-Listening on LPF/eth0/1a:a7:22:20:27:44
-Sending on   LPF/eth0/1a:a7:22:20:27:44
+Listening on LPF/eth0/b2:31:65:5d:ea:a7
+Sending on   LPF/eth0/b2:31:65:5d:ea:a7
 Sending on   Socket/fallback
 xid: warning: no netdev with useable HWADDR found for seed's uniqueness enforcement
-xid: rand init seed (0x6a8552ff) built using gethostid
-DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 3 (xid=0xbf0166a)
-DHCPOFFER of 10.0.0.49 from 10.0.0.2
-DHCPREQUEST for 10.0.0.49 on eth0 to 255.255.255.255 port 67 (xid=0x6a16f00b)
-DHCPACK of 10.0.0.49 from 10.0.0.2 (xid=0xbf0166a)
-bound to 10.0.0.49 -- renewal in 86215 seconds.
+xid: rand init seed (0xc25b7829) built using gethostid
+DHCPDISCOVER on eth0 to 255.255.255.255 port 67 interval 3 (xid=0x6db82574)
+DHCPOFFER of 192.168.50.100 from 192.168.50.2
+DHCPREQUEST for 192.168.50.100 on eth0 to 255.255.255.255 port 67 (xid=0x7425b86d)
+DHCPACK of 192.168.50.100 from 192.168.50.2 (xid=0x6db82574)
+bound to 192.168.50.100 -- renewal in 280 seconds.
 ```
 
-No seu computador host, pare a captura do Wireshark.
-Use `DHCP` como filtro e examine os pacotes capturados.
+Verifique novamente o estado da interface ethernet.
 
-## Resultados
-
-### DHCP Discover
-
-![DHCP Discover](img/DHCP-Discover.png)
-
-### DHCP Offer
-
-![DHCP Offer](img/DHCP-Offer.png)
-
-### DHCP Request
-
-![DHCP Request](img/DHCP-Request.png)
-
-### DHCP ACK
-
-![DHCP ACK](img/DHCP-Ack.png)
-
-### Dados obtidos
-
-Liste os dados obtidos pelo seu container Ubuntu via DHCP:
-- Endereço IP
-- Máscara de rede
-- Default Gateway
-- Lease time
-- Endereço de broadcast
-- Nome do domínio
-- Servidor de DNS
-
-## Comandos interessantes
-
-Para remover a rede `MACVLAN`:
+No cliente:
 
 ```bash
-$ sudo docker network rm dhcp-net
+root@dhcp-client:/# ip addr show eth0
 ```
 
-Para verificar se a rede `MACVLAN` existe:
+Resultado esperado:
 
 ```bash
-$ sudo docker network ls
+root@dhcp-client:/# ip addr show eth0
+2: eth0@if76: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether b2:31:65:5d:ea:a7 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.168.50.100/24 brd 192.168.50.255 scope global dynamic eth0
+       valid_lft 504sec preferred_lft 504sec
 ```
 
-Para verificar quais containers estão conectados em determinada rede (por exemplo, na rede `dhcp-net`):
+Veja que agora o cliente tem endereço IP 192.168.50.100/24.
+
+### Término da captura
+
+Termine a captura no Wireshark.
+
+### Verificação no Servidor
+
+Confirme que o servidor realmente forneceu um endereço IP ao cliente.
+
+No host, entre no container do servidor DHCP:
 
 ```bash
-$ sudo docker network inspect dhcp-net
+$ sudo docker exec -it dhcp-server bash
 ```
+
+Resultado esperado:
+
+```bash
+$ sudo docker exec -it dhcp-server bash
+root@dhcp-server:/#
+```
+
+Liste o arquivo dhcpd.leases para verificar quais endereos IP foram fornecidos.
+
+No server:
+
+```bash
+root@dhcp-server:/# cat /var/lib/dhcp/dhcpd.leases
+```
+
+Resultado esperado:
+
+```bash
+root@dhcp-server:/# cat /var/lib/dhcp/dhcpd.leases
+# The format of this file is documented in the dhcpd.leases(5) manual page.
+# This lease file was written by isc-dhcp-4.4.3-P1
+
+# authoring-byte-order entry is generated, DO NOT DELETE
+authoring-byte-order little-endian;
+
+server-duid "\000\001\000\0012.6\216\272\361\034\204\354\331";
+
+lease 192.168.50.100 {
+  starts 6 2026/09/05 02:14:52;
+  ends 6 2026/09/05 02:24:52;
+  cltt 6 2026/09/05 02:14:52;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet b2:31:65:5d:ea:a7;
+  client-hostname "dhcp-client";
+}
+lease 192.168.50.100 {
+  starts 6 2026/09/05 02:19:32;
+  ends 6 2026/09/05 02:29:32;
+  cltt 6 2026/09/05 02:19:32;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet b2:31:65:5d:ea:a7;
+  client-hostname "dhcp-client";
+}
+lease 192.168.50.100 {
+  starts 6 2026/09/05 02:24:04;
+  ends 6 2026/09/05 02:34:04;
+  cltt 6 2026/09/05 02:24:04;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet b2:31:65:5d:ea:a7;
+  client-hostname "dhcp-client";
+}
+```
+
+### Resultados

@@ -16,7 +16,7 @@ Como cliente, usaremos o telnet para podermos capturar e analisar os datagramas 
 - [Site Dovecot](https://dovecot.org/)
 - [Imagem Dovecot](https://hub.docker.com/r/dovecot/dovecot/)
 - [Repositório Dovecot](https://github.com/dovecot/docker)
-- [IMAP](https://www.rfc-editor.org/info/rfc9051/)
+- [IMAP RFC9051](https://datatracker.ietf.org/doc/html/rfc9051)
 
 ## Procedimento
 

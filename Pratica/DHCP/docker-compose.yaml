@@ -1,0 +1,33 @@
+services:
+
+  dhcp-server:
+    image: meslin/dhcp-server:latest
+    container_name: dhcp-server
+    hostname: dhcp-server
+    networks:
+      dhcp-net:
+        ipv4_address: 192.168.50.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+  dhcp-client:
+    image: meslin/dhcp-client:latest
+    container_name: dhcp-client
+    hostname: dhcp-client
+    stdin_open: true
+    tty: true
+    networks:
+      dhcp-net:
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+networks:
+  dhcp-net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 192.168.50.0/24
+          gateway: 192.168.50.1

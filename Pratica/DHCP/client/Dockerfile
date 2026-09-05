@@ -5,9 +5,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Atualiza a lista de pacotes, instala as ferramentas e limpa o cache
 RUN apt-get update && apt-get install -y \
-    net-tools \
-    iputils-ping \
-    isc-dhcp-client \
+        iproute2 \
+        net-tools \
+        iputils-ping \
+        isc-dhcp-client \
     && rm -rf /var/lib/apt/lists/*
     
 CMD ["/bin/bash"]

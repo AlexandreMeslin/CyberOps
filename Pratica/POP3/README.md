@@ -16,7 +16,7 @@ Como cliente, usaremos o telnet para podermos capturar e analisar os datagramas 
 - [Site Dovecot](https://dovecot.org/)
 - [Imagem Dovecot](https://hub.docker.com/r/dovecot/dovecot/)
 - [Repositório Dovecot](https://github.com/dovecot/docker)
-- [POP3](https://datatracker.ietf.org/doc/html/rfc1939)
+- [POP3 RFC1939](https://datatracker.ietf.org/doc/html/rfc1939)
 
 ## Procedimento
 
