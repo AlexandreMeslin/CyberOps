@@ -1,6 +1,6 @@
-# Laboratório de POP3 e IMAP
+# Laboratório de POP3
 
-Nesse laboratório vamos examinar conexões e troca de mensagens entre clientes e servidors POP3 (Post Office Protocol version 3) e IMAP (Internet Message Access Protocol).
+Nesse laboratório vamos examinar conexões e troca de mensagens entre clientes e servidors POP3 (Post Office Protocol version 3).
 
 Para esse laboratório vamos usar o servidor [Dovecot](https://dovecot.org/) para o correio.
 
@@ -176,7 +176,7 @@ root@mail-client:/#
 
 Dentro do container do cliente, conectar via telnet no servidor POP3:
 
-No containser mail-client:
+No container mail-client:
 
 ```bash
 root@mail-client:/# telnet mail-server 110
@@ -278,3 +278,7 @@ Liste os dados obtidos pela sua captura da sessão :
 - Porta TCP do servidor
 - Quem enviou a primeira mensagem da camada de aplicação
 - A quantidade de pacotes enviados em cada direção
+
+# Grande Desafio!
+
+Use o exemplo do cliente socket e crie um cliente de e-mail POP3.
