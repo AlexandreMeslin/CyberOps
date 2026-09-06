@@ -16,6 +16,7 @@ Vamos usar o **named** como servidor DNS na nossa rede local.
 - [DNS - Implementação](https://datatracker.ietf.org/doc/html/rfc1035)
 - [named - site](https://www.isc.org/bind/)
 - [named - repositório](https://gitlab.isc.org/isc-projects/bind9)
+- [nslookup](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/nslookup)
 
 ## Procedimento
 
@@ -316,7 +317,7 @@ dns-server  | 05-Sep-2026 12:26:54.913 running
 No host:
 
 ```bash
- sudo docker exec -it dns-client bash
+$ sudo docker exec -it dns-client bash
 ```
 
 Resultado esperado:
@@ -326,12 +327,388 @@ $ sudo docker exec -it dns-client bash
 root@client:/# 
 ```
 
-Consulte um FQDN fictício.
+### FQDN fictício local
+
+Consulte um FQDN fictício, por exemplo, verifique o endereço IP de `www.empresa.test`
+
+Inicie a captura com o Wireshark.
 
 No cliente:
 
 ```bash
+root@client:/# nslookup www.empresa.test
+```
 
+Resultado esperado:
+
+```bash
+root@client:/# nslookup www.empresa.test
+Server:		127.0.0.11
+Address:	127.0.0.11#53
+
+Name:	www.empresa.test
+Address: 172.20.0.20
+```
+Ou para obter mais detalhes da consulta.
+
+No Cliente:
+
+```bash
+root@client:/# nslookup -debug www.empresa.test
+```
+
+Resultado esperado:
+
+```bash
+root@client:/# nslookup -debug www.empresa.test
+Server:		127.0.0.11
+Address:	127.0.0.11#53
+
+------------
+    QUESTIONS:
+	www.empresa.test, type = A, class = IN
+    ANSWERS:
+    ->  www.empresa.test
+	internet address = 172.20.0.20
+	ttl = 300
+    AUTHORITY RECORDS:
+    ADDITIONAL RECORDS:
+------------
+Name:	www.empresa.test
+Address: 172.20.0.20
+------------
+    QUESTIONS:
+	www.empresa.test, type = AAAA, class = IN
+    ANSWERS:
+    AUTHORITY RECORDS:
+    ->  empresa.test
+	origin = dns.empresa.test
+	mail addr = admin.empresa.test
+	serial = 2026090501
+	refresh = 3600
+	retry = 600
+	expire = 86400
+	minimum = 300
+	ttl = 300
+    ADDITIONAL RECORDS:
+------------
+```
+
+Termine a captura.
+Examine os resultados.
+
+A query:
+
+![Captura autoritativa A - Query](img/DNS-A-autoritativo-query.png)
+
+A response:
+
+![Captura autoritativa A - Response](img/DNS-A-autoritativo-query.png)
+Consulte também o endereço do servidor de DNS da empresa.
+
+No cliente:
+
+```bash
+root@client:/# nslookup -debug dns.empresa.test
+```
+
+Resultado esperado:
+
+```bash
+root@client:/# nslookup -debug dns.empresa.test
+Server:		127.0.0.11
+Address:	127.0.0.11#53
+
+------------
+    QUESTIONS:
+	dns.empresa.test, type = A, class = IN
+    ANSWERS:
+    ->  dns.empresa.test
+	internet address = 172.20.0.10
+	ttl = 300
+    AUTHORITY RECORDS:
+    ADDITIONAL RECORDS:
+------------
+Name:	dns.empresa.test
+Address: 172.20.0.10
+------------
+    QUESTIONS:
+	dns.empresa.test, type = AAAA, class = IN
+    ANSWERS:
+    AUTHORITY RECORDS:
+    ->  empresa.test
+	origin = dns.empresa.test
+	mail addr = admin.empresa.test
+	serial = 2026090501
+	refresh = 3600
+	retry = 600
+	expire = 86400
+	minimum = 300
+	ttl = 300
+    ADDITIONAL RECORDS:
+------------
+```
+
+### Consulta FQDN Local Inexistente
+
+Consulte um FQDN inexistente.
+
+Inicie a captura com o Wireshark.
+
+No cliente:
+
+```bash
+root@client:/# nslookup -debug naotem.empresa.test
+```
+
+Resultado esperado:
+
+```bash
+root@client:/# nslookup -debug naotem.empresa.test
+Server:		127.0.0.11
+Address:	127.0.0.11#53
+
+------------
+    QUESTIONS:
+	naotem.empresa.test, type = A, class = IN
+    ANSWERS:
+    AUTHORITY RECORDS:
+    ->  empresa.test
+	origin = dns.empresa.test
+	mail addr = admin.empresa.test
+	serial = 2026090501
+	refresh = 3600
+	retry = 600
+	expire = 86400
+	minimum = 300
+	ttl = 300
+    ADDITIONAL RECORDS:
+------------
+** server can't find naotem.empresa.test: NXDOMAIN
+```
+
+Termine a captura.
+Analise os resultados.
+
+A query:
+
+![Query autoritativa não existente](img/DNS-A-autoritativa-naoexistente-Query.png)
+
+A response:
+
+![Response autoritativa não existente](img/DNS-A-autoritative-naoexistente-response.png)
+
+### FQDN Externo
+
+Agora consulte um FQDN fora da empresa.
+
+No cliente:
+
+```bash
+root@client:/# nslookup -debug www.google.com
+```
+
+Resultado esperado:
+
+```bash
+root@client:/# nslookup -debug www.google.com     
+Server:		127.0.0.11
+Address:	127.0.0.11#53
+
+------------
+    QUESTIONS:
+	www.google.com, type = A, class = IN
+    ANSWERS:
+    ->  www.google.com
+	internet address = 142.251.154.119
+	ttl = 52
+    ->  www.google.com
+	internet address = 142.251.151.119
+	ttl = 52
+    ->  www.google.com
+	internet address = 142.251.156.119
+	ttl = 52
+    ->  www.google.com
+	internet address = 142.251.153.119
+	ttl = 52
+    ->  www.google.com
+	internet address = 142.251.150.119
+	ttl = 52
+    ->  www.google.com
+	internet address = 142.251.152.119
+	ttl = 52
+    ->  www.google.com
+	internet address = 142.251.155.119
+	ttl = 52
+    ->  www.google.com
+	internet address = 142.251.157.119
+	ttl = 52
+    AUTHORITY RECORDS:
+    ADDITIONAL RECORDS:
+------------
+Non-authoritative answer:
+Name:	www.google.com
+Address: 142.251.154.119
+Name:	www.google.com
+Address: 142.251.151.119
+Name:	www.google.com
+Address: 142.251.156.119
+Name:	www.google.com
+Address: 142.251.153.119
+Name:	www.google.com
+Address: 142.251.150.119
+Name:	www.google.com
+Address: 142.251.152.119
+Name:	www.google.com
+Address: 142.251.155.119
+Name:	www.google.com
+Address: 142.251.157.119
+------------
+    QUESTIONS:
+	www.google.com, type = AAAA, class = IN
+    ANSWERS:
+    ->  www.google.com
+	has AAAA address 2001:4860:482d:7700::
+	ttl = 199
+    ->  www.google.com
+	has AAAA address 2001:4860:482b:7700::
+	ttl = 199
+    ->  www.google.com
+	has AAAA address 2001:4860:4829:7700::
+	ttl = 199
+    ->  www.google.com
+	has AAAA address 2001:4860:4826:7700::
+	ttl = 199
+    ->  www.google.com
+	has AAAA address 2001:4860:4828:7700::
+	ttl = 199
+    ->  www.google.com
+	has AAAA address 2001:4860:482c:7700::
+	ttl = 199
+    ->  www.google.com
+	has AAAA address 2001:4860:482a:7700::
+	ttl = 199
+    ->  www.google.com
+	has AAAA address 2001:4860:4827:7700::
+	ttl = 199
+    AUTHORITY RECORDS:
+    ADDITIONAL RECORDS:
+------------
+Name:	www.google.com
+Address: 2001:4860:482d:7700::
+Name:	www.google.com
+Address: 2001:4860:482b:7700::
+Name:	www.google.com
+Address: 2001:4860:4829:7700::
+Name:	www.google.com
+Address: 2001:4860:4826:7700::
+Name:	www.google.com
+Address: 2001:4860:4828:7700::
+Name:	www.google.com
+Address: 2001:4860:482c:7700::
+Name:	www.google.com
+Address: 2001:4860:482a:7700::
+Name:	www.google.com
+Address: 2001:4860:4827:7700::
+
+root@client:/# ifconfig 
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.20.0.2  netmask 255.255.255.0  broadcast 172.20.0.255
+        ether 26:d1:14:ba:19:ad  txqueuelen 0  (Ethernet)
+        RX packets 105  bytes 11636 (11.6 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 32  bytes 1876 (1.8 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 28  bytes 2484 (2.4 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 28  bytes 2484 (2.4 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+
+As consultas anteriores foram a registros do tipo A.
+Vamos fazer consultas a registros do tipo MX (correio).
+Primeiro para o servidor de correio da empresa.
+
+No cliente:
+
+```bash
+root@client:/# nslookup -debug -type=MX empresa.test
+```
+
+Resultado esperado:
+
+`root@client:/# nslookup -debug -type=MX empresa.test
+Server:		127.0.0.11
+Address:	127.0.0.11#53
+
+------------
+    QUESTIONS:
+	empresa.test, type = MX, class = IN
+    ANSWERS:
+    ->  empresa.test
+	mail exchanger = 10 mail.empresa.test.
+	ttl = 300
+    AUTHORITY RECORDS:
+    ADDITIONAL RECORDS:
+    ->  mail.empresa.test
+	internet address = 172.20.0.30
+	ttl = 300
+------------
+empresa.test	mail exchanger = 10 mail.empresa.test.
+``bash
+
+```
+
+Agora, para um servidor de correio externo.
+
+No cliente:
+
+```bash
+root@client:/# nslookup -debug -type=MX gmail.com
+```
+
+Resultado esperado:
+
+```bash
+root@client:/# nslookup -debug -type=MX gmail.com   
+Server:		127.0.0.11
+Address:	127.0.0.11#53
+
+------------
+    QUESTIONS:
+	gmail.com, type = MX, class = IN
+    ANSWERS:
+    ->  gmail.com
+	mail exchanger = 30 alt3.gmail-smtp-in.l.google.com.
+	ttl = 2429
+    ->  gmail.com
+	mail exchanger = 40 alt4.gmail-smtp-in.l.google.com.
+	ttl = 2429
+    ->  gmail.com
+	mail exchanger = 5 gmail-smtp-in.l.google.com.
+	ttl = 2429
+    ->  gmail.com
+	mail exchanger = 10 alt1.gmail-smtp-in.l.google.com.
+	ttl = 2429
+    ->  gmail.com
+	mail exchanger = 20 alt2.gmail-smtp-in.l.google.com.
+	ttl = 2429
+    AUTHORITY RECORDS:
+    ADDITIONAL RECORDS:
+------------
+Non-authoritative answer:
+gmail.com	mail exchanger = 30 alt3.gmail-smtp-in.l.google.com.
+gmail.com	mail exchanger = 40 alt4.gmail-smtp-in.l.google.com.
+gmail.com	mail exchanger = 5 gmail-smtp-in.l.google.com.
+gmail.com	mail exchanger = 10 alt1.gmail-smtp-in.l.google.com.
+gmail.com	mail exchanger = 20 alt2.gmail-smtp-in.l.google.com.
+
+Authoritative answers can be found from:
 ```
 
 ```bash
@@ -358,14 +735,6 @@ No cliente:
 
 ```
 
-```bash
+## Resultados
 
-```
-
-```bash
-
-```
-
-```bash
-
-```
+- Compare uma consulta A com uma AAAA
