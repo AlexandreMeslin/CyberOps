@@ -192,7 +192,7 @@ Escape character is '^]'.
 +OK Dovecot ready.
 ```
 
-> [!INFO]
+> [!TIP]
 > Para sair do `telnet` digite `quit`.
 
 Entre com o usuário `test` com as seguintes credenciais:
