@@ -24,13 +24,13 @@ Suba os containers.
 
 No host:
 
-```bash
+```
 $ sudo docker compose up -d
 ```
 
 Resultado esperado
 
-```bash
+```
 $ sudo docker compose up -d
 [+] Running 3/3
  ✔ Network dns_dns-net   Created                              0.1s 
@@ -40,13 +40,13 @@ $ sudo docker compose up -d
 
 Verifique se os containers estão no ar:
 
-```bash
+```
 $ sudo docker ps -a
 ```
 
 Resultado esperado:
 
-```bash
+```
 $ sudo docker ps -a
 CONTAINER ID   IMAGE               COMMAND                  CREATED         STATUS         PORTS            NAMES
 4d7de0808d65   meslin/dns-client   "/bin/bash"              2 minutes ago   Up 2 minutes                    dns-client
@@ -55,13 +55,13 @@ ae78dd849be5   meslin/dns-server   "named -g -c /etc/bi…"   2 minutes ago   Up
 
 Verifique as redes existentes:
 
-```bash
+```
 $ sudo docker network ls
 ```
 
 Resultado esperado:
 
-```bash
+```
 $ sudo docker network ls
 NETWORK ID     NAME          DRIVER    SCOPE
 626fb2ea3cb6   bridge        bridge    local
@@ -72,13 +72,13 @@ NETWORK ID     NAME          DRIVER    SCOPE
 
 Verifique também a rede que foi criada:
 
-```bash
+```
 $ sudo docker network inspect dns_dns-net
 ```
 
 Resultado esperado:
 
-```bash
+```
  sudo docker network inspect dns_dns-net
 [
     {
@@ -148,13 +148,13 @@ Analise o log do servidor DNS.
 
 No host:
 
-```bash
+```
 $ sudo docker compose logs dns-server
 ```
 
 Resultado esperado:
 
-```bash
+```
 $ sudo docker compose logs dns-server
 dns-server  | 05-Sep-2026 12:26:54.863 starting BIND 9.18.39-0ubuntu0.24.04.7-Ubuntu (Extended Support Version) <id:>
 dns-server  | 05-Sep-2026 12:26:54.863 running on Linux x86_64 7.0.0-30-generic #30~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug  7 13:27:52 UTC 2
@@ -316,13 +316,13 @@ dns-server  | 05-Sep-2026 12:26:54.913 running
 
 No host:
 
-```bash
+```
 $ sudo docker exec -it dns-client bash
 ```
 
 Resultado esperado:
 
-```bash
+```
 $ sudo docker exec -it dns-client bash
 root@client:/# 
 ```
@@ -335,13 +335,13 @@ Inicie a captura com o Wireshark.
 
 No cliente:
 
-```bash
+```
 root@client:/# nslookup www.empresa.test
 ```
 
 Resultado esperado:
 
-```bash
+```
 root@client:/# nslookup www.empresa.test
 Server:		127.0.0.11
 Address:	127.0.0.11#53
@@ -353,13 +353,13 @@ Ou para obter mais detalhes da consulta.
 
 No Cliente:
 
-```bash
+```
 root@client:/# nslookup -debug www.empresa.test
 ```
 
 Resultado esperado:
 
-```bash
+```
 root@client:/# nslookup -debug www.empresa.test
 Server:		127.0.0.11
 Address:	127.0.0.11#53
@@ -397,24 +397,24 @@ Address: 172.20.0.20
 Termine a captura.
 Examine os resultados.
 
-A query:
+A *query*:
 
 ![Captura autoritativa A - Query](img/DNS-A-autoritativo-query.png)
 
-A response:
+A *response*:
 
 ![Captura autoritativa A - Response](img/DNS-A-autoritativo-query.png)
 Consulte também o endereço do servidor de DNS da empresa.
 
 No cliente:
 
-```bash
+```
 root@client:/# nslookup -debug dns.empresa.test
 ```
 
 Resultado esperado:
 
-```bash
+```
 root@client:/# nslookup -debug dns.empresa.test
 Server:		127.0.0.11
 Address:	127.0.0.11#53
@@ -457,13 +457,13 @@ Inicie a captura com o Wireshark.
 
 No cliente:
 
-```bash
+```
 root@client:/# nslookup -debug naotem.empresa.test
 ```
 
 Resultado esperado:
 
-```bash
+```
 root@client:/# nslookup -debug naotem.empresa.test
 Server:		127.0.0.11
 Address:	127.0.0.11#53
@@ -502,15 +502,17 @@ A response:
 
 Agora consulte um FQDN fora da empresa.
 
+Inicie a captura com o Wireshark.
+
 No cliente:
 
-```bash
+```
 root@client:/# nslookup -debug www.google.com
 ```
 
 Resultado esperado:
 
-```bash
+```
 root@client:/# nslookup -debug www.google.com     
 Server:		127.0.0.11
 Address:	127.0.0.11#53
@@ -630,19 +632,44 @@ lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 ```
 
-As consultas anteriores foram a registros do tipo A.
+Termine a captura.
+Analise os resultados.
+
+Primeiro, observe a sequência de consultas (query) e respostas (response).
+
+![DNS - Captura não autoritativa](img/DNS-Captura-nonautoritavite.png)
+
+1. (1) Cliente 172.20.0.2 > Servidor 172.20.0.10: Qual é o IPv4 de www.google.com?
+1. (4) Servidor 172.20.0.10 > Resolver Recursivo 8.8.8.8: Qual é o IPv4 de www.google.com?
+1. (5) Servidor 172.20.0.10 > F-root 192.5.5.241: Quais são os servidores da raiz? (note que essa consulta foi efetuada em paralelo com a anterior)
+1. (6) Resolver Recursivo 8.8.8.8 > Servidor 172.20.0.10: Estes são os endereços IPv4 de www.google.com.
+1. (7) F-root 192.5.5.241 > Servidor 172.20.0.10: Estes são os servidores da raiz. 
+1. (8) Resolver Recursivo 8.8.8.8 > Cliente 172.20.0.2: Estes são os endereços IPv4 de www.google.com.
+1. (9) Cliente 172.20.0.2 > Servidor 172.20.0.10: Qual é o IPv6 de www.google.com?
+1. (10) Servidor 172.20.0.10 > Resolver Recursivo 1.1.1.1: Qual é o IPv6 de www.google.com? (em round-robin)
+1. (11) Resolver Recursivo 1.1.1.1 > Servidor 172.20.0.10: Estes são os endereços IPv6 de www.google.com.
+1. (12) Servidor 172.20.0.10 > Cliente 172.20.0.2: Estes são os endereços IPv6 de www.google.com.
+
+Expanda cada um dos datagramas capturados e examine o payload da aplicação (Domain Name System).
+
+### Consulta MX
+
+As consultas anteriores foram a registros do tipo A e AAAA.
 Vamos fazer consultas a registros do tipo MX (correio).
 Primeiro para o servidor de correio da empresa.
 
+Inicie a captura com o Wireshark.
+
 No cliente:
 
-```bash
+```
 root@client:/# nslookup -debug -type=MX empresa.test
 ```
 
 Resultado esperado:
 
-`root@client:/# nslookup -debug -type=MX empresa.test
+```
+root@client:/# nslookup -debug -type=MX empresa.test
 Server:		127.0.0.11
 Address:	127.0.0.11#53
 
@@ -660,21 +687,33 @@ Address:	127.0.0.11#53
 	ttl = 300
 ------------
 empresa.test	mail exchanger = 10 mail.empresa.test.
-``bash
-
 ```
+
+Termine a captura.
+Analise os resultados.
+
+A *query*:
+
+![DNS - Consulta MX - domínio interno](img/DNS-MX-autoritative-Query.png)
+
+A *response*:
+
+![DNS - Resposta MX - domínio interno](img/DNS-MX-autoritative-Response.png)
+
+> [!NOTE]
+> Observe que a resposta apenas apresenta o FQDN do servidor de correio. Para saber o endereço IP, devemos fazer uma consulta do tipo A ou AAAA.
 
 Agora, para um servidor de correio externo.
 
 No cliente:
 
-```bash
+```
 root@client:/# nslookup -debug -type=MX gmail.com
 ```
 
 Resultado esperado:
 
-```bash
+```
 root@client:/# nslookup -debug -type=MX gmail.com   
 Server:		127.0.0.11
 Address:	127.0.0.11#53
@@ -711,30 +750,11 @@ gmail.com	mail exchanger = 20 alt2.gmail-smtp-in.l.google.com.
 Authoritative answers can be found from:
 ```
 
-```bash
-
-```
-
-```bash
-
-```
-
-```bash
-
-```
-
-```bash
-
-```
-
-```bash
-
-```
-
-```bash
-
-```
-
 ## Resultados
 
 - Compare uma consulta A com uma AAAA
+- Obtenha o endereço IP do seu correio
+- Quais são os FQDNs dos root-servers do DNS?
+- Quais são os endereços IP dos root-servers do DNS?
+- Faça duas consultas em sequência a um mesmo FQDN e analise as diferenças
+- Faça duas consultas em sequência a um mesmo FQDN, mas de dois clientes diferentes e, novamente, analise as diferenças

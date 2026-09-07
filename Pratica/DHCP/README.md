@@ -9,7 +9,7 @@ Nesse laboratório vamos investigar como os hosts obtém o seu endereço IPv4, s
 
 ## Bibliografia
 
-- [DHCP RFC2131](https://datatracker.ietf.org/doc/html/rfc9051)
+- [DHCP - RFC 2131](https://datatracker.ietf.org/doc/html/rfc9051)
 
 ## Procedimento
 
