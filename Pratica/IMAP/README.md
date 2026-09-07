@@ -192,7 +192,7 @@ Escape character is '^]'.
 * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] Dovecot ready.
 ```
 
-> [!INFO]
+> [!TIP]
 > Para sair do `telnet` digite `quit`.
 
 Entre com o usuário `test` com as seguintes credenciais:
