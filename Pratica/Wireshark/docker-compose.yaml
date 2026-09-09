@@ -1,0 +1,25 @@
+services:
+
+  server:
+    image: meslin/wireshark-server:latest
+    container_name: wireshark-server
+    hostname: server
+    networks:
+      - wireshark-net
+    ports:
+      - "22:22"
+      - "23:23"
+      - "80:80"
+
+  client:
+    image: meslin/wireshark-client:latest
+    container_name: wireshark-client
+    hostname: client
+    networks:
+      - wireshark-net
+    stdin_open: true
+    tty: true
+
+networks:
+  wireshark-net:
+    driver: bridge
