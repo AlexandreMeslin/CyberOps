@@ -1,0 +1,35 @@
+services:
+
+  client1:
+    image: meslin/arp-client:latest
+    container_name: arp-client1
+    stdin_open: true
+    tty: true
+    networks:
+      arp-net:
+        ipv4_address: 192.168.1.10
+
+  client2:
+    image: meslin/arp-client:latest
+    container_name: arp-client2
+    stdin_open: true
+    tty: true
+    networks:
+      arp-net:
+        ipv4_address: 192.168.1.20
+
+  server:
+    build: ./server
+    container_name: arp-server
+    stdin_open: true
+    tty: true
+    networks:
+      arp-net:
+        ipv4_address: 192.168.1.2
+
+networks:
+  arp-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24

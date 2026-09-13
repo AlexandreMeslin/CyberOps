@@ -82,3 +82,28 @@ Repositório para o curso de extensão de CyberOps da PUC-Rio, cobrindo a teoria
 ## Objetivo do curso
 
 O objetivo do curso é consolidar os fundamentos de redes e protocolos por meio de aulas teóricas e atividades práticas aplicadas ao contexto de CyberOps.
+
+## Erros e suas "soluções"
+
+### Permissão negada
+
+#### Descrição
+
+Não tem permissão para se conectar ao daemon.
+
+#### Sintoma
+
+```bash
+$ docker compose up -d
+unable to get image 'meslin/arp-client:latest': permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.51/images/meslin/arp-client:latest/json": dial unix /var/run/docker.sock: connect: permission denied
+```
+
+#### Solução
+
+Esqueceu de usar `sudo`?
+
+Tente de novo:
+
+```bash
+$ sudo docker compose up -d
+```
