@@ -236,11 +236,11 @@ root@af453b5aab70:/# ip neigh
 192.168.1.20 dev eth0 lladdr 22:81:86:e6:62:8e DELAY 
 ```
 Entendendo da tabela ARP do cliente 1:
-- 192.168.1.20 - endereço IP do vizinho
+- 192.168.1.20 -- endereço IP do vizinho
 - dev eth0 -- interface pela qual o vizinho é alcançado
-- lladdr --- Link Layer Address
-- 22:81:86:e6:62:8e - endereço MAC do vizinho
-- DELAY - (ou REACHABLE ou STALE) indica o estado da entrada na tabela como "a confirmar", "confirmado" ou "antigo"
+- lladdr -- Link Layer Address
+- 22:81:86:e6:62:8e -- endereço MAC do vizinho
+- DELAY -- (ou REACHABLE ou STALE) indica o estado da entrada na tabela como "a confirmar", "confirmado" ou "antigo"
 
 #### ARP Request
 
@@ -261,3 +261,85 @@ Observe:
 - Endereço MAC de destino agora é o endereço MAC do cliente 1, ou seja, a mensagem é unicast
 - Também não há camadas superiores
 - O *payload* contém o endereço IP do cliente 2
+
+### Acessando hosts em outra rede
+
+Vamos agora acessar um host que está em uma outra rede através do roteador `router`.
+
+#### Início da Captura
+
+No cliente 1, examine a tabela de roteamento e verifique se o default gateway é o roteador no endereço IP 192.168.1.2.
+
+> [!WARNING]
+> Faça as contas e verifique se o endereço do default gateway do cliente 1 está na mesma rede dele!
+
+No cliente 1:
+
+```
+root@2477215f4393:/# ip route
+```
+
+Resultado esperado:
+
+```
+root@2477215f4393:/# ip route
+default via 192.168.1.2 dev eth0 
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10 
+```
+
+Através do Wireshark, inicie a captura e envie um ping para o cliente 3 que tem o endereço ip 192.168.2.20.
+
+No cliente 1:
+
+```
+root@2667eccbd84e:/# ping -c 1 192.168.2.20
+```
+
+Resultado esperado:
+
+```
+root@2667eccbd84e:/# ping -c 1 192.168.2.20
+PING 192.168.2.20 (192.168.2.20) 56(84) bytes of data.
+64 bytes from 192.168.2.20: icmp_seq=1 ttl=63 time=0.241 ms
+
+--- 192.168.2.20 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.241/0.241/0.241/0.000 ms
+```
+
+#### Término da captura
+
+Termine a captura no Wireshark.
+
+![ARP - captura em redes diferentes](img/ARP-redes_diferentes-captura.png)
+
+Examine os resultados
+
+- Qual foi (e de quem foi) o endereço MAC origem do ARP Request?
+- Qual foi (e de quem foi) o endereço MAC destino do ARP Request?
+- Qual foi (e de quem foi) o endereço MAC origem do ARP Reply?
+- Qual foi (e de quem foi) o endereço MAC destino do ARP Reply?
+
+Tente também fazer captura na rede `net2` e responda:
+
+- Houve um ARP Request seguido de reply (se não, lembre-se de limpar a tabela ARP do `router`)?
+- Qual foi (e de quem foi) o endereço MAC origem do ARP Request?
+- Qual foi (e de quem foi) o endereço MAC destino do ARP Request?
+- Qual foi (e de quem foi) o endereço MAC origem do ARP Reply?
+- Qual foi (e de quem foi) o endereço MAC destino do ARP Reply?
+
+## Comandos Interessantes
+
+### Flush na Tabela ARP
+
+Se você quiser esvaziar a tabela ARP.
+
+No container:
+
+```
+root@33a01243eb06:/# ip neigh 
+192.168.1.20 dev eth0 lladdr 7e:e4:3d:d3:bd:b7 REACHABLE 
+root@33a01243eb06:/# ip neigh flush all
+root@33a01243eb06:/# ip neigh 
+root@33a01243eb06:/# 
+```

@@ -8,6 +8,12 @@ services:
     networks:
       arp-net:
         ipv4_address: 192.168.1.10
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      sh -c "ip route replace default via 192.168.1.2 &&
+            tail -f /dev/null"
 
   client2:
     image: meslin/arp-client:latest
@@ -17,19 +23,49 @@ services:
     networks:
       arp-net:
         ipv4_address: 192.168.1.20
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
 
-  server:
-    build: ./server
-    container_name: arp-server
+  client3:
+    image: meslin/arp-client:latest
+    container_name: arp-client3
+    stdin_open: true
+    tty: true
+    networks:
+      net2:
+        ipv4_address: 192.168.2.20
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      sh -c "ip route replace default via 192.168.2.2 &&
+            tail -f /dev/null"
+
+  router:
+    image: meslin/arp-router:latest
+    sysctls:
+      net.ipv4.ip_forward: "1"
+    container_name: arp-router
     stdin_open: true
     tty: true
     networks:
       arp-net:
         ipv4_address: 192.168.1.2
-
+      net2:
+        ipv4_address: 192.168.2.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+  
 networks:
   arp-net:
     driver: bridge
     ipam:
       config:
         - subnet: 192.168.1.0/24
+  net2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24
