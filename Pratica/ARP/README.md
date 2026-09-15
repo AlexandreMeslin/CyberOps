@@ -11,6 +11,10 @@ Nesse laboratório vamos investigar como os hosts obtém endereço MAC de outros
 
 - [ARP - RFC 826](https://datatracker.ietf.org/doc/html/rfc826)
 
+## Topologia
+
+![ARP - Topologia](img/ARP-topologia.png)
+
 ## Procedimento
 
 Suba os containers.

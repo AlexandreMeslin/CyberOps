@@ -15,6 +15,9 @@ services:
     image: meslin/dhcp-client:latest
     container_name: dhcp-client
     hostname: dhcp-client
+    depends_on:
+      - dhcp-server
+
     stdin_open: true
     tty: true
     networks:

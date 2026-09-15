@@ -18,6 +18,10 @@ Vamos usar o **named** como servidor DNS na nossa rede local.
 - [named - repositório](https://gitlab.isc.org/isc-projects/bind9)
 - [nslookup](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/nslookup)
 
+## Topologia
+
+![DNS - Topologia](img/DNS-Topologia.png)
+
 ## Procedimento
 
 Suba os containers.

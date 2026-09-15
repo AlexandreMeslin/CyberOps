@@ -1,0 +1,95 @@
+services:
+
+  dhcp-server:
+    image: meslin/dhcp-server:latest
+    container_name: dhcp-server
+    hostname: dhcp-server
+    networks:
+      dhcp-net:
+        ipv4_address: 192.168.50.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+  relay:
+    image: meslin/dhcp-relay:latest
+    container_name: dhcp-relay
+    hostname: dhcp-relay
+
+    sysctls:
+      net.ipv4.ip_forward: 1
+
+    networks:
+      dhcp-net:
+        ipv4_address: 192.168.50.3
+      net1:
+        ipv4_address: 10.10.0.3
+      net2:
+        ipv4_address: 10.20.0.3
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./relay:/etc/relay
+
+  dhcp-client:
+    image: meslin/dhcp-client:latest
+    container_name: dhcp-client
+    depends_on:
+      - dhcp-server
+    hostname: dhcp-client
+    stdin_open: true
+    tty: true
+    networks:
+      dhcp-net:
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+  dhcp-client1:
+    image: meslin/dhcp-client:latest
+    container_name: dhcp-client1
+    hostname: dhcp-client1
+    stdin_open: true
+    tty: true
+    networks:
+      net1:
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+
+  dhcp-client2:
+    image: meslin/dhcp-client:latest
+    container_name: dhcp-client2
+    hostname: dhcp-client2
+    stdin_open: true
+    tty: true
+    networks:
+      net2:
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+networks:
+  dhcp-net:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 192.168.50.0/24
+          gateway: 192.168.50.1
+  net1:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.10.0.0/24
+          gateway: 10.10.0.1
+  net2:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.20.0.0/24
+          gateway: 10.20.0.1

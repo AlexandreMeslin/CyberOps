@@ -10,6 +10,10 @@ Tanto o cliente quanto o servidor serão executados dentro de um container Docke
 - Plugin Compose para Docker
 - Wireshark
 
+## Topologia
+
+![Socket - Topologia](img/Socket-Topologia.png)
+
 ## Procedimento
 
 ### Preparando o ambiente

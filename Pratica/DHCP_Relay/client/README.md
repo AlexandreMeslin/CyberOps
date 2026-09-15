@@ -1,0 +1,1 @@
+# Vamos usar o mesmo client do laboratório de DHCP
