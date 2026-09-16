@@ -10,6 +10,12 @@ services:
     cap_add:
       - NET_ADMIN
       - NET_RAW
+    command: >
+      sh -c "
+        ip route add 10.10.0.0/24 via 192.168.50.3 2>/dev/null &&
+        ip route add 10.20.0.0/24 via 192.168.50.3 2>/dev/null &&
+        exec dhcpd -f -d --no-pid eth0
+      "
 
   relay:
     image: meslin/dhcp-relay:latest

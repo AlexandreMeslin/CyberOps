@@ -159,7 +159,7 @@ Execute o programa servidor em Python:
 
 Dentro do container `socket-server`:
 
-```bash
+```
 root@server:/app# python3 server.py
 ```
 
@@ -175,7 +175,7 @@ Execute o programa cliente em Python:
 
 Dentro do container `socket-client`:
 
-```bash
+```
 root@client:/app# python3 client.py 
 ```
 

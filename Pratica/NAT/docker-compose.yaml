@@ -1,0 +1,75 @@
+services:
+
+  client1:
+    image: meslin/nat-client:latest
+    container_name: nat-client1
+    hostname: client1
+    stdin_open: true
+    tty: true
+    networks:
+      internal:
+        ipv4_address: 192.168.10.10
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+      ip route add 203.0.113.0/24 via 192.168.10.2 &&
+      exec bash
+      "
+
+  client2:
+    image: meslin/nat-client:latest
+    container_name: nat-client2
+    hostname: client2
+    stdin_open: true
+    tty: true
+    networks:
+      internal:
+        ipv4_address: 192.168.10.20
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ip route add 203.0.113.0/24 via 192.168.10.2 &&
+        exec bash
+      "
+
+  nat-router:
+    image: meslin/nat-router:latest
+    container_name: nat-router
+    hostname: nat-router
+    networks:
+      internal:
+        interface_name: eth0
+        ipv4_address: 192.168.10.2
+      external:
+        interface_name: eth1
+        ipv4_address: 203.0.113.2
+    cap_add:
+      - NET_ADMIN
+
+  server:
+    image: meslin/nat-server:latest
+    container_name: nat-server
+    hostname: nat-server
+    stdin_open: true
+    tty: true
+    networks:
+      external:
+        ipv4_address: 203.0.113.100
+    cap_add:
+      - NET_ADMIN
+
+networks:
+  internal:
+    internal: true
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24
+
+  external:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 203.0.113.0/24

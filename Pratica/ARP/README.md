@@ -79,7 +79,7 @@ Opcionalmente, verifique as redes.
 No host:
 
 ```bash
- sudo docker network ls
+$ sudo docker network ls
 NETWORK ID     NAME          DRIVER    SCOPE
 ef411ff7de56   arp_arp-net   bridge    local
 340a21aece36   bridge        bridge    local
@@ -88,7 +88,6 @@ ef411ff7de56   arp_arp-net   bridge    local
 ```
 
 ### Início da Captura
-
 
 Entre no cliente 1.
 
@@ -100,7 +99,7 @@ $ sudo docker compose exec client1 bash
 
 Resultado esperado:
 
-```bash
+```
 $ sudo docker compose exec client1 bash
 root@cdb4a100b67e:/# 
 ```
@@ -136,7 +135,7 @@ root@cdb4a100b67e:/# ip neigh
 
 Antes de iniciar a captura, veja o nome da rede.
 
-No cliente 1 (substitua o nome da rede pelo nome da sua rede):
+No host (substitua o nome da rede pelo nome da sua rede):
 
 ```bash
 $ sudo docker network inspect arp_arp-net

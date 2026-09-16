@@ -28,13 +28,13 @@ Suba os containers.
 
 No host:
 
-```
+```bash
 $ sudo docker compose up -d
 ```
 
 Resultado esperado
 
-```
+```bash
 $ sudo docker compose up -d
 [+] Running 3/3
  ✔ Network dns_dns-net   Created                              0.1s 
@@ -44,13 +44,13 @@ $ sudo docker compose up -d
 
 Verifique se os containers estão no ar:
 
-```
+```bash
 $ sudo docker ps -a
 ```
 
 Resultado esperado:
 
-```
+```bash
 $ sudo docker ps -a
 CONTAINER ID   IMAGE               COMMAND                  CREATED         STATUS         PORTS            NAMES
 4d7de0808d65   meslin/dns-client   "/bin/bash"              2 minutes ago   Up 2 minutes                    dns-client
@@ -59,13 +59,13 @@ ae78dd849be5   meslin/dns-server   "named -g -c /etc/bi…"   2 minutes ago   Up
 
 Verifique as redes existentes:
 
-```
+```bash
 $ sudo docker network ls
 ```
 
 Resultado esperado:
 
-```
+```bash
 $ sudo docker network ls
 NETWORK ID     NAME          DRIVER    SCOPE
 626fb2ea3cb6   bridge        bridge    local
@@ -76,14 +76,14 @@ NETWORK ID     NAME          DRIVER    SCOPE
 
 Verifique também a rede que foi criada:
 
-```
+```bash
 $ sudo docker network inspect dns_dns-net
 ```
 
 Resultado esperado:
 
-```
- sudo docker network inspect dns_dns-net
+```bash
+$ sudo docker network inspect dns_dns-net
 [
     {
         "Name": "dns_dns-net",
@@ -152,13 +152,13 @@ Analise o log do servidor DNS.
 
 No host:
 
-```
+```bash
 $ sudo docker compose logs dns-server
 ```
 
 Resultado esperado:
 
-```
+```bash
 $ sudo docker compose logs dns-server
 dns-server  | 05-Sep-2026 12:26:54.863 starting BIND 9.18.39-0ubuntu0.24.04.7-Ubuntu (Extended Support Version) <id:>
 dns-server  | 05-Sep-2026 12:26:54.863 running on Linux x86_64 7.0.0-30-generic #30~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Aug  7 13:27:52 UTC 2
@@ -320,13 +320,13 @@ dns-server  | 05-Sep-2026 12:26:54.913 running
 
 No host:
 
-```
+```bash
 $ sudo docker exec -it dns-client bash
 ```
 
 Resultado esperado:
 
-```
+```bash
 $ sudo docker exec -it dns-client bash
 root@client:/# 
 ```

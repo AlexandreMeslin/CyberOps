@@ -169,7 +169,7 @@ $ sudo docker compose exec mail-client bash
 
 Resultado esperado:
 
-```bash
+```
 $ sudo docker compose exec mail-client bash
 root@mail-client:/# 
 ```
@@ -178,13 +178,13 @@ Dentro do container do cliente, conectar via telnet no servidor IMAP:
 
 No container mail-client:
 
-```bash
+```
 root@mail-client:/# telnet mail-server 143
 ```
 
 Resultado esperado:
 
-```bash
+```
 root@mail-client:/# telnet mail-server 143
 Trying 172.18.0.2...
 Connected to mail-server.

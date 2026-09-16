@@ -1,28 +1,11 @@
-# Laboratório de DHCP
-
-Nesse laboratório vamos investigar como os hosts obtém o seu endereço IPv4, sua máscara de rede, endereço de gateway e outras configurações iniciais.
-
-## Requisitos
-
-- Docker
-- Wireshark
-
-## Bibliografia
-
-- [DHCP - RFC 2131](https://datatracker.ietf.org/doc/html/rfc9051)
+# Laboratório de NAT
 
 ## Topologia
 
-![DHCP - Topologia](img/DHCP-topologia.png)
-## Procedimento
+![NAT - Topologia](img/NAT-topologia.png)
 
-Suba os containers:
 
-```bash
-$ sudo docker compose up -d
-```
-
-Resultado esperado:
+## Comandos importantes
 
 ```bash
 $ sudo docker compose up -d
@@ -32,28 +15,12 @@ $ sudo docker compose up -d
  ✔ Container dhcp-client  Started                             0.4s 
 ```
 
-Verifique se os containers estão no ar:
-
-```bash
-$ sudo docker ps -a
-```
-
-Resultado esperado:
-
 ```bash
 $ sudo docker ps -a
 CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS     NAMES
 c2aae4d145f9   meslin/dhcp-server:latest   "dhcpd -f -d --no-pi…"   27 seconds ago   Up 26 seconds             dhcp-server
 7144f14720e8   meslin/dhcp-client:latest   "/bin/bash"              27 seconds ago   Up 26 seconds             dhcp-client
 ```
-
-Verifique as redes existentes:
-
-```bash
-$ sudo docker network ls
-```
-
-Resultado esperado:
 
 ```bash
 $ sudo docker network ls
@@ -63,14 +30,6 @@ c698171464ec   dhcp_dhcp-net   bridge    local
 1b5be87839cd   host            host      local
 97f519bf0843   none            null      local
 ```
-
-Verifique também a rede que foi criada:
-
-```bash
-$ sudo docker network inspect dhcp_dhcp-net
-```
-
-Resultado esperado:
 
 ```bash
 $ sudo docker network inspect dhcp_dhcp-net
@@ -138,36 +97,10 @@ $ sudo docker network inspect dhcp_dhcp-net
 ]
 ```
 
-No exemplo, o servidor tem o endereço IP 192.168.50.2/24 e o cliente, 192.168.50.3/24.
-
-Anote os 12 primeiros caracteres do ID da rede.
-Nesse exemplo, o ID é "Id": "c749a7d4d53bb2f1a7761d98629a5c1f66a2d33279c3f135d00e0fd488f0894a".
-O nome da rede Linux criada é formada por `br-<12 primeiros caracteres>`, ou seja, `br-c749a7d4d53b`.
-Verifique o seu nome de rede para poder iniciar a captura com o Wireshark.
-
-### Início da Captura
-
-Através do Wireshark, inicie a captura na interface de rede `br-c749a7d4d53b` (substitua pela sua interface, vista um pouco acima).
-
-### Obtendo Endereço IP via DHCP
-
-Entre no container cliente.
-
-No host:
-
-```bash
-$ sudo docker exec -it dhcp-client bash
 ```
-
-No container do cliente, verifique o endereço IP atribuido pelo Docker:
-
-No cliente:
-
+$ sudo docker exec -it dhcp-client1 bash
+root@dhcp-client:/# 
 ```
-root@dhcp-client:/# ip addr show eth0
-```
-
-Resultado esperado:
 
 ```
 root@dhcp-client:/# ip addr show eth0
@@ -177,41 +110,16 @@ root@dhcp-client:/# ip addr show eth0
        valid_lft forever preferred_lft forever
 ```
 
-Neste exemplo, o cliente está com endereço IP 192.168.50.3.
-Agora vamos remover o endereço atribuido pelo Docker e obter um novo endereço IP através de DHCP usando o nosso servidor.
-
-No cliente, execute os dois comandos a seguir:
-
 ```
 root@dhcp-client:/# ip addr flush dev eth0
 root@dhcp-client:/# ip route flush dev eth0
 ```
-
-Verifique agora o estado da interface de rede:
-
-```
-root@dhcp-client:/# ip addr show eth0
-```
-
-Veja que a interface não tem mais endereço IP.
-
-Resultado esperado:
 
 ```
 root@dhcp-client:/# ip addr show eth0
 2: eth0@if76: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
     link/ether b2:31:65:5d:ea:a7 brd ff:ff:ff:ff:ff:ff link-netnsid 0
 ```
-
-Busque um novo endereço IP via DHCP.
-
-No cliente:
-
-```
-root@dhcp-client:/# dhclient -v eth0
-```
-
-Resultado esperado:
 
 ```
 root@dhcp-client:/# dhclient -v eth0
@@ -231,57 +139,6 @@ DHCPREQUEST for 192.168.50.100 on eth0 to 255.255.255.255 port 67 (xid=0x7425b86
 DHCPACK of 192.168.50.100 from 192.168.50.2 (xid=0x6db82574)
 bound to 192.168.50.100 -- renewal in 280 seconds.
 ```
-
-Verifique novamente o estado da interface ethernet.
-
-No cliente:
-
-```
-root@dhcp-client:/# ip addr show eth0
-```
-
-Resultado esperado:
-
-```
-root@dhcp-client:/# ip addr show eth0
-2: eth0@if76: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
-    link/ether b2:31:65:5d:ea:a7 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 192.168.50.100/24 brd 192.168.50.255 scope global dynamic eth0
-       valid_lft 504sec preferred_lft 504sec
-```
-
-Veja que agora o cliente tem endereço IP 192.168.50.100/24.
-
-### Término da captura
-
-Termine a captura no Wireshark.
-
-### Verificação no Servidor
-
-Confirme que o servidor realmente forneceu um endereço IP ao cliente.
-
-No host, entre no container do servidor DHCP:
-
-```bash
-$ sudo docker exec -it dhcp-server bash
-```
-
-Resultado esperado:
-
-```
-$ sudo docker exec -it dhcp-server bash
-root@dhcp-server:/#
-```
-
-Liste o arquivo `dhcpd.leases` para verificar quais endereÇos IP foram fornecidos.
-
-No server:
-
-```
-root@dhcp-server:/# cat /var/lib/dhcp/dhcpd.leases
-```
-
-Resultado esperado:
 
 ```
 root@dhcp-server:/# cat /var/lib/dhcp/dhcpd.leases
@@ -303,65 +160,4 @@ lease 192.168.50.100 {
   hardware ethernet b2:31:65:5d:ea:a7;
   client-hostname "dhcp-client";
 }
-```
-
-## Resultados
-
-### Captura
-
-Analise a captura.
-Se necessário, filtre por `DHCP`.
-
-![Captura DHCP](img/DHCP-captura.png)
-
-### DHCP Discover
-
-![DHCP Discover](img/DHCP-Discover.png)
-
-### DHCP Offer
-
-![DHCP Offer](img/DHCP-Offer.png)
-
-### DHCP Request
-
-![DHCP Request](img/DHCP-Request.png)
-
-### DHCP Ack
-
-![DHCP Ack](img/DHCP-Ack.png)
-
-### Captura completa
-
-Analise a captura completa, sem filtros:
-
-![DHCP Captura Completa](img/DHCP-Captura_Completa.png)
-
-### Dados obtidos
-
-Liste os dados obtidos pelo seu container Ubuntu via DHCP:
-- Endereço IP
-- Máscara de rede
-- Default Gateway
-- Lease time
-- Endereço de broadcast
-- Nome do domínio
-- Servidor de DNS
-
-# pequeno desafio (com letras minúsculas)
-
-Libere o endereço IP que você obteve.
-Capture e analise os pacotes usando o Wireshark.
-Utilize o comando `dhclient -r eth0` para matar o processo cliente.
-
-No cliente:
-
-```
-root@dhcp-client:/# dhclient -r eth0
-```
-
-Resultado esperado
-
-```
-root@dhcp-client:/# dhclient -r eth0
-Killed old client process
 ```

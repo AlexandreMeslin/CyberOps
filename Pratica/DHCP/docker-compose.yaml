@@ -6,6 +6,7 @@ services:
     hostname: dhcp-server
     networks:
       dhcp-net:
+        interface_name: eth0
         ipv4_address: 192.168.50.2
     cap_add:
       - NET_ADMIN

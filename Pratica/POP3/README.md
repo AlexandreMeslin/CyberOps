@@ -178,13 +178,13 @@ Dentro do container do cliente, conectar via telnet no servidor POP3:
 
 No container mail-client:
 
-```bash
+```
 root@mail-client:/# telnet mail-server 110
 ```
 
 Resultado esperado:
 
-```bash
+```
 root@mail-client:/# telnet mail-server 110
 Trying 172.18.0.2...
 Connected to mail-server.
