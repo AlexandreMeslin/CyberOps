@@ -90,6 +90,10 @@ $ sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 $ sudo docker run hello-world
 ```
 
+## Topologia
+
+![Server Client](img/server-switch-client.png)
+
 ## Procedimento
 
 ### Containers

@@ -12,7 +12,7 @@ Tanto o cliente quanto o servidor serão executados dentro de um container Docke
 
 ## Topologia
 
-![Socket - Topologia](img/Socket-Topologia.png)
+![Socket - Topologia](img/server-switch-client.png)
 
 ## Procedimento
 

@@ -10,6 +10,7 @@ Nesse laboratório vamos investigar como os hosts obtém o seu endereço IPv4, s
 ## Bibliografia
 
 - [DHCP - RFC 2131](https://datatracker.ietf.org/doc/html/rfc9051)
+- [ISC-DHCP](https://gitlab.isc.org/isc-projects/dhcp/-/blob/master/server/dhcpd.conf.example?ref_type=heads)
 
 ## Topologia
 

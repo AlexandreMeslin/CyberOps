@@ -1,0 +1,9 @@
+zone "empresa.local" {
+    type master;
+    file "/etc/bind/db.empresa.local";
+};
+
+zone "20.168.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/db.192.168.20";
+};

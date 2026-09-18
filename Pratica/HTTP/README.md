@@ -9,6 +9,10 @@ Nesse laboratório vamos observar todo o processo de uma requisição HTTP, desd
 - cURL
 - Navegador
 
+## Topologia
+
+![Server x Client](img/server-switch-client.png)
+
 ## Procedimento
 
 1. Criar o container Apache

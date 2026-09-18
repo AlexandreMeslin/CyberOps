@@ -1,0 +1,177 @@
+services:
+  border-router:
+    image: meslin/dhcp-relay:latest
+    container_name: border-router
+    hostname: border-router
+    restart: unless-stopped
+    networks:
+      external-net:
+        interface_name: eth0
+        ipv4_address: 203.0.113.1
+      admin-net:
+        interface_name: eth1
+        ipv4_address: 192.168.10.1
+      server-net:
+        interface_name: eth2
+        ipv4_address: 192.168.20.1
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ethtool -K eth0 tx off rx off &&
+        ethtool -K eth1 tx off rx off &&
+        ethtool -K eth2 tx off rx off &&
+        sysctl -w net.ipv4.ip_forward=1 &&
+        dhcrelay -d -4 -i eth1 -i eth2 192.168.20.10
+      "
+
+  web-external:
+    build: ./web-external
+    container_name: web-external
+    hostname: web-external
+    depends_on:
+      - border-router
+    restart: unless-stopped
+    networks:
+      external-net:
+        ipv4_address: 203.0.113.100
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ip route add 192.168.0.0/16 via 203.0.113.1 &&
+        httpd-foreground
+      "
+
+  dhcp-server:
+    image: meslin/dhcp-server:latest
+    container_name: dhcp-server
+    hostname: dhcp-server
+    depends_on:
+      - border-router
+    restart: unless-stopped
+    mac_address: "02:02:C0:A8:20:10"
+    volumes:
+      - ./dhcp-server/dhcpd.conf:/etc/dhcp/dhcpd.conf:ro
+    networks:
+      server-net:
+        interface_name: eth0
+        ipv4_address: 192.168.20.10
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ip route add default via 192.168.20.1 &&
+        dhcpd -f -d --no-pid eth0
+      "
+
+  dns-server:
+    build: ./dns-server
+    container_name: dns-server
+    hostname: dns-server
+    depends_on:
+      - border-router
+    restart: unless-stopped
+    mac_address: "02:02:C0:A8:20:20"
+    volumes:
+      - ./dns-server/named.conf:/etc/bind/named.conf:ro
+      - ./dns-server/named.conf.local:/etc/bind/named.conf.local:ro
+      - ./dns-server/db.empresa.local:/etc/bind/db.empresa.local:ro
+      - ./dns-server/db.192.168.20:/etc/bind/db.192.168.20:ro
+    networks:
+      server-net:
+        interface_name: eth0
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ip addr flush dev eth0 &&
+        ip route flush dev eth0 &&
+        named -g -c /etc/bind/named.conf
+      "
+
+  web-server:
+    build: ./web-server
+    container_name: web-server
+    hostname: web-server
+    depends_on:
+      - border-router
+    restart: unless-stopped
+    mac_address: "02:02:C0:A8:20:30"
+    networks:
+      server-net:
+        interface_name: eth0
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ip addr flush dev eth0 &&
+        ip route flush dev eth0 &&
+        httpd-foreground
+      "
+
+  client1:
+    image: meslin/dhcp-client:latest
+    container_name: client1
+    hostname: client1
+    depends_on:
+      - border-router
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    networks:
+      - admin-net
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ip addr flush dev eth0 &&
+        ip route flush dev eth0 &&
+        /bin/bash
+      "
+
+  client2:
+    image: meslin/dhcp-client:latest
+    container_name: client2
+    hostname: client2
+    depends_on:
+      - border-router
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    networks:
+      - admin-net
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ip addr flush dev eth0 &&
+        ip route flush dev eth0 &&
+        /bin/bash
+      "
+
+networks:
+  server-net:
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.inhibit_ipv4: "true"
+    ipam:
+      config:
+        - subnet: 192.168.20.0/24
+  external-net:
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.inhibit_ipv4: "true"
+    ipam:
+      config:
+        - subnet: 203.0.113.0/24
+  admin-net:
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.inhibit_ipv4: "true"
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24

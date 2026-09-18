@@ -1,0 +1,19 @@
+$TTL 300
+
+@       IN      SOA     ns.empresa.local. admin.empresa.local. (
+                        2026091701
+                        3600
+                        600
+                        86400
+                        300
+)
+
+        IN      NS      ns.empresa.local.
+
+ns      IN      A       192.168.20.10
+
+dhcp    IN      A       192.168.20.10
+dns     IN      A       192.168.20.10
+
+web     IN      A       192.168.20.20
+www     IN      A       192.168.20.20

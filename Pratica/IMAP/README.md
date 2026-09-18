@@ -18,6 +18,10 @@ Como cliente, usaremos o telnet para podermos capturar e analisar os datagramas 
 - [Repositório Dovecot](https://github.com/dovecot/docker)
 - [IMAP - RFC 9051](https://datatracker.ietf.org/doc/html/rfc9051)
 
+## Topologia
+
+![Server x client](img/server-switch-client.png)
+
 ## Procedimento
 
 Vá para o diretório `Pratica/Correio/` e suba os containers:
