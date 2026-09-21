@@ -1,0 +1,43 @@
+services:
+  server:
+    image: fauria/vsftpd:latest
+    container_name: ftp-server
+    hostname: ftp
+    networks:
+      ftp-net:
+        aliases:
+          - ftp
+    restart: always
+    ports:
+      - "20:20"
+      - "21:21"
+      - "21100-21110:21100-21110"
+    environment:
+      - FTP_USER=user
+      - FTP_PASS=senha123
+      - PASV_ADDRESS=127.0.0.1
+      - PASV_MIN_PORT=21100
+      - PASV_MAX_PORT=21110
+      - PASV_ENABLE=YES
+      - LOG_STDOUT=YES
+
+  client:
+    # uso:
+    # $ sudo docker exec -it ftp-client bash
+    # root@client:/# ftp ftp-server 21
+    build: ./client
+    container_name: ftp-client
+    hostname: client
+    networks:
+      ftp-net:
+        aliases:
+          - client
+    stdin_open: true
+    tty: true
+    depends_on:
+      - server
+  
+networks:
+  ftp-net:
+    driver: bridge
+    internal: true

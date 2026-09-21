@@ -1,9 +1,6 @@
-FROM httpd:latest
+FROM meslin/dhcp-relay:latest
 
 RUN apt-get update \
     && apt-get install -y \
-        iproute2 \
-        isc-dhcp-client \
-        curl \
         iptables \
     && rm -rf /var/lib/apt/lists/*

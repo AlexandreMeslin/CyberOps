@@ -31,3 +31,8 @@ eth2 | 192.168.20.2/24
 
 ## Procedimento
 
+## Comandos Importantes
+
+```bash
+$ sudo docker compose build --no-cache web-server
+```
