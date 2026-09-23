@@ -22,7 +22,7 @@ services:
         ethtool -K eth1 tx off rx off &&
         ethtool -K eth2 tx off rx off &&
         sysctl -w net.ipv4.ip_forward=1 &&
-        iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 8080 -j DNAT --to-destination 192.168.20.30:80 &&
+        iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 192.168.20.30:80 &&
         iptables -A FORWARD -i eth0 -o eth2 -p tcp -d 192.168.20.30 --dport 80 -j ACCEPT &&
         iptables -A FORWARD -i eth2 -o eth0 -p tcp -s 192.168.20.30 --sport 80 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT &&
         dhcrelay -d -4 -i eth1 -i eth2 192.168.20.10
