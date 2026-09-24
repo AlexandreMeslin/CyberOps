@@ -46,6 +46,27 @@ services:
         httpd-foreground
       "
 
+  client-external:
+    image: meslin/dhcp-client:latest
+    container_name: client-external
+    hostname: client-external
+    depends_on:
+      - border-router
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    networks:
+      external-net:
+        ipv4_address: 203.0.113.101
+    cap_add:
+      - NET_ADMIN
+    command: >
+      sh -c "
+        ip addr flush dev eth0 &&
+        ip route flush dev eth0 &&
+        /bin/bash
+      "
+
   dhcp-server:
     image: meslin/dhcp-server:latest
     container_name: dhcp-server
