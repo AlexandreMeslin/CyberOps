@@ -1,6 +1,6 @@
 $TTL 300
 
-@       IN      SOA     ns.empresa.local. admin.empresa.local. (
+@       IN      SOA     ns.meslin.com.br. admin.meslin.com.br. (
                         2026091701
                         3600
                         600
@@ -8,8 +8,8 @@ $TTL 300
                         300
 )
 
-        IN      NS      ns.empresa.local.
+        IN      NS      ns.meslin.com.br.
 
-10      IN      PTR     dhcp.empresa.local.
-20      IN      PTR     dns.empresa.local.
-30      IN      PTR     web.empresa.local.
+10      IN      PTR     dhcp.meslin.com.br.
+20      IN      PTR     dns.meslin.com.br.
+30      IN      PTR     web.meslin.com.br.

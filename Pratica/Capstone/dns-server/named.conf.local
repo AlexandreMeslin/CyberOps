@@ -1,6 +1,6 @@
-zone "empresa.local" {
+zone "meslin.com.br" {
     type master;
-    file "/etc/bind/db.empresa.local";
+    file "/etc/bind/db.meslin.com.br";
 };
 
 zone "20.168.192.in-addr.arpa" {

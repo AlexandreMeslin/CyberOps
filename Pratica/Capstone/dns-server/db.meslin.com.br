@@ -1,6 +1,6 @@
 $TTL 300
 
-@       IN      SOA     ns.empresa.local. admin.empresa.local. (
+@       IN      SOA     ns.meslin.com.br. admin.meslin.com.br. (
                         2026091701
                         3600
                         600
@@ -8,7 +8,7 @@ $TTL 300
                         300
 )
 
-        IN      NS      ns.empresa.local.
+        IN      NS      ns.meslin.com.br.
 
 ns      IN      A       192.168.20.20
 

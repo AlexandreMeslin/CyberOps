@@ -35,6 +35,8 @@ services:
     depends_on:
       - border-router
     restart: unless-stopped
+    volumes:
+      - ./web-external/:/usr/local/apache2/htdocs/:ro
     networks:
       external-net:
         ipv4_address: 203.0.113.100
@@ -100,7 +102,7 @@ services:
     volumes:
       - ./dns-server/named.conf:/etc/bind/named.conf:ro
       - ./dns-server/named.conf.local:/etc/bind/named.conf.local:ro
-      - ./dns-server/db.empresa.local:/etc/bind/db.empresa.local:ro
+      - ./dns-server/db.meslin.com.br:/etc/bind/db.meslin.com.br:ro
       - ./dns-server/db.192.168.20:/etc/bind/db.192.168.20:ro
     networks:
       server-net:
@@ -122,6 +124,8 @@ services:
       - border-router
     restart: unless-stopped
     mac_address: "02:02:C0:A8:20:30"
+    volumes:
+      - ./web-server/:/usr/local/apache2/htdocs/:ro
     networks:
       server-net:
         interface_name: eth0
