@@ -316,6 +316,8 @@ Termine a captura no Wireshark.
 
 ![ARP - captura em redes diferentes](img/ARP-redes_diferentes-captura.png)
 
+## Dados Obtidos
+
 Examine os resultados
 
 - Qual foi (e de quem foi) o endereço MAC origem do ARP Request?
